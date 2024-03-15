@@ -1,2 +1,5 @@
 gen/*
 gen/!.gitkeep
+
+*.local
+./**/*.local
