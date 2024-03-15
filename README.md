@@ -37,26 +37,25 @@ These are the application required:
 
 ## `Cube` project structure
 
-| Directory            | Description                                                                                                                                                                                                           |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `build`              | Store distributable files of the project and its thirdparty `Cube` projects.                                                                                                                                          |
-| `build/bin`          | Stores built binary of the project and its thirdparty `Cube` projects. The binary has version as suffix (`<BIN_NAME>.<VERSION>`).                                                                                     |
-| `build/include`      | Stores header files of the project and its thirdparty `Cube` projects. The header files is stored in their own directory with its project's name and version as the name (`build/include/<PROJECT_NAME>/<VERSION>/`). |
-| `build/lib`          | Stores built binary with the file with the naming format as `lib<PROJECT_NAME>.<VERSION>.a`.                                                                                                                          |
-| `cube`               | Stores all the thirdparty `Cube` projects. It is handled by the `Cube` Makefile.                                                                                                                                      |
-| `gen`                | Stores the generated object files of the project.                                                                                                                                                                     |
-| `include`            | Stores the header files to be distributed, it will be copied to the `build/include` directory.                                                                                                                        |
-| `platform`           | Stores platform specific configuration.                                                                                                                                                                               |
-| `platform/flag`      | Stores `.flag` text files record compiler flags required for building binary that depends on the current `Cube` projects (e.g. system library to be linked to for each platform).                                     |
-| `platform/toolchain` | Stores configuration Makefiles for overriding build tools for specific platform, useful for [cross-compiling](#cross-compiling).                                                                                      |
-| `source`             | Stores all the `.c` source files.                                                                                                                                                                                     |
-| `source/bin`         | Stores source files that will be build into executables. Each source file compiles to an executable with the same name and output to `build/bin`. The executable is linked to library in `build/lib`.                 |
-| `source/lib`         | Stores source files that will be build into a static library, output to `build/lib`.                                                                                                                                  |
+| Directory            | Description                                                                                                                                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `build`              | Store distributable files of the project and its thirdparty `Cube` projects.                                                                                                                          |
+| `build/bin`          | Stores built binary of the project and its thirdparty `Cube` projects. (`<BIN_NAME>`).                                                                                                                |
+| `build/include`      | Stores header files of the project and its thirdparty `Cube` projects. The header files is stored in their own directory with its project's name (`build/include/<PROJECT_NAME>/`).                   |
+| `build/lib`          | Stores built binary with the file with the naming format as `lib<PROJECT_NAME>.a`.                                                                                                                    |
+| `cube`               | Stores all the thirdparty `Cube` projects. It is handled by the `Cube` Makefile.                                                                                                                      |
+| `gen`                | Stores the generated object files of the project.                                                                                                                                                     |
+| `include`            | Stores the header files to be distributed, it will be copied to the `build/include` directory.                                                                                                        |
+| `platform`           | Stores platform specific configuration.                                                                                                                                                               |
+| `platform/flag`      | Stores `.flag` text files record compiler flags required for building binary that depends on the current `Cube` projects (e.g. system library to be linked to for each platform).                     |
+| `platform/toolchain` | Stores configuration Makefiles for overriding build tools for specific platform, useful for [cross-compiling](#cross-compiling).                                                                      |
+| `source`             | Stores all the `.c` source files.                                                                                                                                                                     |
+| `source/bin`         | Stores source files that will be build into executables. Each source file compiles to an executable with the same name and output to `build/bin`. The executable is linked to library in `build/lib`. |
+| `source/lib`         | Stores source files that will be build into a static library, output to `build/lib`.                                                                                                                  |
 
 > [!NOTE]
 >
 > Project name (`<PROJECT_NAME>`) is the name of the directory your project resided.
-> Version (`<VERSION>`) is the `git` hash or tag (if available).
 
 ## The `Cube` Makefile
 
@@ -110,49 +109,11 @@ the thirdparty `Cube` projects output to the root `build` directory using the gi
 The `Cube` Makefile should record the library's output path to `ROOT_DEPENDENCIES_FILE` once it is compiled in order to record the sequence of the dependencies.
 Duplicates in `ROOT_DEPENDENCIES_FILE` is prohibited.
 
-The `ROOT_DEPENDENCIES_FILE` is named `<PROJECT_NAME>.<VERSION>.DEPENDENCIES` and reside in `ROOT_BUILD_LIB_DIR`.
+The `ROOT_DEPENDENCIES_FILE` is named `<PROJECT_NAME>.DEPENDENCIES` and reside in `ROOT_BUILD_LIB_DIR`.
 In the `ROOT_DEPENDENCIES_FILE`, The libraries depends on the libraries before itself.
 
-The `ROOT_FLAG_FILE` is named `<PROJECT_NAME>.<VERSION>.FLAG` and reside in `ROOT_BUILD_LIB_DIR`.
+The `ROOT_FLAG_FILE` is named `<PROJECT_NAME>.FLAG` and reside in `ROOT_BUILD_LIB_DIR`.
 In the `ROOT_FLAG_FILE`, it stores the list of compiler flags.
-
-## Versioning
-
-The version of the library is the `git` hash or tag (if available) of the current commit.
-It is incorporated into the distributed files' name (as stated in the [`Cube` project structure](#cube-project-structure)).
-Unfortunately, the symbols of the library do not automatically incorporate the version.
-Given this dependency tree:
-
-```
-parent
-| - child_a
-| | - child_b (version: v1_0_1)
-| - child_b (version: v1_0_9)
-```
-
-Both `child_b v1_0_9` and `child_b v1_0_1` will output their own static library to the root `build` directory (the `parent`'s `build` directory).
-Since they are essentially the same library but different version, it could contain the same functions with the same symbols.
-This would lead to duplicate symbol linker error when linking both library together.
-
-To fix this issue, you could either:
-
-1. Consider the version when naming the function.
-2. Make sure the `Cube` library has the same version.
-
-For the first option, a macro `VERSION` is also defined when compiling, the programmer could utilize this macro to differentiate function of different version.
-
-```c
-#define LITERAL_CONCAT(x, y) x ## y
-#define CONCAT(x, y) LITERAL_CONCAT(x, y)
-#define AFFIX_VERSION(identifier) CONCAT(identifier, VERSION)
-
-int AFFIX_VERSION(foo)(int a, int b);
-#define foo(a, b) (AFFIX_VERSION(foo)(a, b))
-```
-
-> [!WARN]
->
-> The `1.` way could cause bloated software and you'll need to spend more time versioning the code. Please follow the `2.` way.
 
 ## Adding a `Cube` project as thirdparty library
 

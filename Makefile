@@ -61,12 +61,10 @@ ECHO:=echo
 MAKE:=make
 CAT:=cat
 RM:=rm -rf
-GIT:=git
 CD:=cd
 
 include $(TOOLCHAIN_DIR)$(PLATFORM).$(ARCH).toolchain.mk
 
-VERSION:=$(shell $(CD) $(CURRENT_DIR) && $(GIT) name-rev --tags --name-only --always --no-undefined $(shell $(GIT) rev-parse HEAD))
 PROJECT_NAME:=$(lastword $(subst /, ,$(CURRENT_DIR)))
 
 export ROOT_DIR?=$(CURRENT_DIR)
@@ -74,12 +72,12 @@ export ROOT_BUILD_DIR?=$(ROOT_DIR)build/
 export ROOT_BUILD_BIN_DIR?=$(ROOT_BUILD_DIR)bin/
 export ROOT_BUILD_INCLUDE_DIR?=$(ROOT_BUILD_DIR)include/
 export ROOT_BUILD_LIB_DIR?=$(ROOT_BUILD_DIR)lib/
-export ROOT_DEPENDENCIES_FILE?=$(ROOT_BUILD_LIB_DIR)$(PROJECT_NAME).$(VERSION).DEPENDENCIES
-export ROOT_FLAG_FILE?=$(ROOT_BUILD_LIB_DIR)$(PROJECT_NAME).$(VERSION).FLAG
-export ROOT_DISTRIBUTED_INCLUDE_DIR?=$(ROOT_BUILD_INCLUDE_DIR)$(PROJECT_NAME)/$(VERSION)/
+export ROOT_DEPENDENCIES_FILE?=$(ROOT_BUILD_LIB_DIR)$(PROJECT_NAME).DEPENDENCIES
+export ROOT_FLAG_FILE?=$(ROOT_BUILD_LIB_DIR)$(PROJECT_NAME).FLAG
+export ROOT_DISTRIBUTED_INCLUDE_DIR?=$(ROOT_BUILD_INCLUDE_DIR)$(PROJECT_NAME)/
 
 override CFLAGS:=-Wall -Wextra $(CFLAGS)
-override DEFINES+=VERSION=$(VERSION)
+override DEFINES+=
 override DEBUG_CFLAGS+=-O0 -g -DDEBUG
 override RELEASE_CFLAGS+=-O2 -DRELEASE
 
@@ -88,8 +86,8 @@ bin_sources_files=$(wildcard $(SOURCE_BIN_DIR)*.c)
 include_files:=$(wildcard $(INCLUDE_DIR)*.h)
 lib_object_files:= $(lib_source_files:$(SOURCE_LIB_DIR)%.c=$(GEN_DIR)%.o)
 cube_makefiles:=$(wildcard $(CUBE_DIR)*/Makefile)
-bin_files:=$(bin_sources_files:$(SOURCE_BIN_DIR)%.c=$(ROOT_BUILD_BIN_DIR)%.${VERSION})
-lib_file:=$(if $(lib_object_files),$(ROOT_BUILD_LIB_DIR)lib$(PROJECT_NAME).${VERSION}.a)
+bin_files:=$(bin_sources_files:$(SOURCE_BIN_DIR)%.c=$(ROOT_BUILD_BIN_DIR)%)
+lib_file:=$(if $(lib_object_files),$(ROOT_BUILD_LIB_DIR)lib$(PROJECT_NAME).a)
 distributed_include_files:=$(include_files:$(INCLUDE_DIR)%.h=$(ROOT_DISTRIBUTED_INCLUDE_DIR)%.h)
 flag_file:=$(FLAG_DIR)$(PLATFORM).flag
 
@@ -132,7 +130,7 @@ $(ROOT_DISTRIBUTED_INCLUDE_DIR)%.h: $(INCLUDE_DIR)%.h
 	@$(MKDIR) $(ROOT_DISTRIBUTED_INCLUDE_DIR)
 	@$(CP) $< $@
 
-$(ROOT_BUILD_BIN_DIR)%.$(VERSION): $(SOURCE_BIN_DIR)%.c $(lib_file) $(distributed_include_files) $(ROOT_DEPENDENCIES_FILE)
+$(ROOT_BUILD_BIN_DIR)%: $(SOURCE_BIN_DIR)%.c $(lib_file) $(distributed_include_files) $(ROOT_DEPENDENCIES_FILE)
 	$(CC) $(CFLAGS) $(DEFINES:%=-D%) $< $(call reverse,$(shell $(CAT) $(ROOT_DEPENDENCIES_FILE))) -o $@ -I$(ROOT_BUILD_INCLUDE_DIR) -I$(INCLUDE_DIR) -I$(CURRENT_DIR) $(shell $(CAT) $(ROOT_FLAG_FILE))
 
 $(lib_file): $(lib_object_files) $(ROOT_DEPENDENCIES_FILE) $(flag_file) $(ROOT_FLAG_FILE)
