@@ -1,5 +1,6 @@
 #include <list.h>
 
+#include <string.h>
 #include <alloc.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -41,6 +42,33 @@ cow_t list_clean(list_t *m_list)
     return (cow_t){0};
 }
 
+cow_t list_push(list_t *m_list, data_t p_data)
+{
+    // Bad arguments.
+    if (m_list == NULL)
+        return COW(true, "Target list (`m_list`) is `NULL`.", sizeof(char));
+
+    if (p_data.ptr == NULL)
+        return COW(true, "Input data's pointer (`p_data.ptr`) is `NULL`.", sizeof(char));
+
+    if (p_data.size != m_list->slice.data.size)
+        return COW(true, "The size of input data (`p_data`) and target list (`m_list`) is incompatible.", sizeof(char));
+
+    // Initialize status.
+    cow_t status = (cow_t){0};
+
+    // Allocate memory.
+    if ((status = list_reserve(m_list, m_list->slice.length + 1)).data.ptr != NULL)
+        return status;
+
+    uint8_t *const casted_ptr = (uint8_t *)m_list->slice.data.ptr;
+    uint8_t *const indexed_ptr = casted_ptr + (m_list->slice.length * m_list->slice.data.size);
+    memcpy((void *)indexed_ptr, p_data.ptr, p_data.size);
+    m_list->slice.length += 1;
+
+    return status;
+}
+
 cow_t list_string_from(list_t *r_string, const char *p_message, ...)
 {
     // Bad arguments.
@@ -58,7 +86,7 @@ cow_t list_string_from(list_t *r_string, const char *p_message, ...)
     va_start(args, p_message);
 
     // Calculate the length.
-    size_t length = vsnprintf(NULL, 0, p_message, args) + 1;
+    size_t length = vsnprintf(NULL, 0, p_message, args) + 1; // Include null-terminator.
 
     // Initialize list.
     list_t list = LIST(sizeof(char));
@@ -72,8 +100,8 @@ cow_t list_string_from(list_t *r_string, const char *p_message, ...)
     }
 
     // Write to list.
-    vsnprintf(*list_char_ptr, length, p_message, args);
-    list.slice.length = length;
+    vsnprintf(*list_char_ptr, length, p_message, args); // `vsnprintf` will always write null-terminator.
+    list.slice.length = length - 1;                     // Exclude null-terminator.
 
     // Return values.
     *r_string = list;
