@@ -12,15 +12,15 @@ typedef struct cow_t
 } cow_t;
 
 /// Shorthanded literal.
-#define COW_NEW(mp_borrowed, mp_ptr, mp_size) \
-    (cow_t)                                   \
-    {                                         \
-        .borrowed = (mp_borrowed),            \
-        .data = (data_t)                      \
-        {                                     \
-            .ptr = (mp_ptr),                  \
-            .size = (mp_size)                 \
-        }                                     \
+#define COW(mp_borrowed, mp_ptr, mp_size) \
+    (cow_t)                               \
+    {                                     \
+        .borrowed = (mp_borrowed),        \
+        .data = (data_t)                  \
+        {                                 \
+            .ptr = (mp_ptr),              \
+            .size = (mp_size)             \
+        }                                 \
     }
 
 #endif // CONTAINER_COW_H

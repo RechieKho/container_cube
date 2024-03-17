@@ -11,7 +11,7 @@ typedef struct data_t
 } data_t;
 
 /// Shorthand literal.
-#define DATA_NEW(mp_ptr, mp_size) \
+#define DATA(mp_ptr, mp_size) \
     (data_t) { .ptr = (mp_ptr), .size = (mp_size) }
 
 /// Cast the `mp_data.ptr` pointer to given `id_type` type.
