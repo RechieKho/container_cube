@@ -119,7 +119,7 @@ clean_cube:
 .PHONY: clean_cube
 
 clean: clean_cube
-	$(RM) $(lib_object_files)
+	$(RM) $(GEN_DIR)*
 ifeq ($(ROOT_DIR),$(CURRENT_DIR))
 	$(RM) $(ROOT_BUILD_INCLUDE_DIR)* $(ROOT_BUILD_BIN_DIR)* $(ROOT_BUILD_LIB_DIR)*
 endif
