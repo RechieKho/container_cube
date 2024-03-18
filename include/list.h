@@ -28,6 +28,9 @@ error_t list_reserve(list_t *m_list, size_t p_min_capacity);
 /// Free all the resource in the list.
 error_t list_clean(list_t *m_list);
 
+/// Extends list.
+error_t list_extend(list_t *m_list, size_t p_new_length);
+
 /// Push an element into the list.
 error_t list_push(list_t *m_list, data_t p_data);
 

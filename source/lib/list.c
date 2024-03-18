@@ -49,6 +49,28 @@ end:
     return error;
 }
 
+error_t list_extend(list_t *m_list, size_t p_new_length)
+{
+    // Initialize error.
+    ERROR_START(error);
+
+    // Bad arguments.
+    PANIC(error, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
+
+    // Early return.
+    if (m_list->slice.length >= p_new_length)
+        return error;
+
+    // Allocate memory.
+    TRY(error, end, list_reserve(m_list, p_new_length));
+
+    // Extends.
+    m_list->slice.length = p_new_length;
+
+end:
+    return error;
+}
+
 error_t list_push(list_t *m_list, data_t p_data)
 {
     // Initialize error.
@@ -59,11 +81,8 @@ error_t list_push(list_t *m_list, data_t p_data)
     PANIC(error, end, p_data.ptr == NULL, "Input data's pointer (`p_data.ptr`) is `NULL`.");
     PANIC(error, end, p_data.size != m_list->slice.data.size, "The size of input data (`p_data`) and target list (`m_list`) is incompatible.");
 
-    // Allocate memory.
-    TRY(error, end, list_reserve(m_list, m_list->slice.length + 1));
-    m_list->slice.length += 1; // Extends.
-
-    // Set the data.
+    // Extends
+    TRY(error, end, list_extend(m_list, m_list->slice.length + 1));
     TRY(error, end, slice_set(&m_list->slice, m_list->slice.length - 1, p_data));
 
 end:
