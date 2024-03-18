@@ -16,5 +16,7 @@ end:
     ERROR_PRINT(error)
     ERROR_END(error);
 
+    list_clean(&message);
+
     return 0;
 }
