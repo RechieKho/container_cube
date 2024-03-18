@@ -22,19 +22,15 @@ typedef struct list_t
     }
 
 /// Reallocate memory with the capacity to be at least `p_min_capacity`.
-/// Return a message (`const char*`) on error, else NULL.
 list_t list_reserve(list_t *m_list, size_t p_min_capacity);
 
 /// Free all the resource in the list.
-/// Return a message (`const char*`) on error, else NULL.
 list_t list_clean(list_t *m_list);
 
 /// Push an element into the list.
-/// Return a message (`const char*`) on error, else NULL.
 list_t list_push(list_t *m_list, data_t p_data);
 
-/// Create a list of character (string) through formatting.
-/// Return a message (`const char*`) on error, else NULL.
-list_t list_string_from(list_t *r_string, const char *p_message, ...);
+/// Append formatted string into a list of characters.
+list_t list_string_append(list_t *m_string, const char *p_message, ...);
 
 #endif // CONTAINER_LIST_H
