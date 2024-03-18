@@ -14,6 +14,10 @@ typedef struct data_t
 #define DATA(mp_ptr, mp_size) \
     (data_t) { .ptr = (mp_ptr), .size = (mp_size) }
 
+/// Create `data_t` from variable
+#define DATA_FROM_VARIABLE(mp_variable) \
+    (data_t) { .ptr = &(mp_variable), .size = sizeof(mp_variable) }
+
 /// Cast the `mp_data.ptr` pointer to given `id_type` type.
 /// Results `id_ref` variable that points to `mp_data.ptr` (a double pointer).
 /// `id_ref` is `NULL` when the size is not the same.

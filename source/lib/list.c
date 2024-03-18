@@ -61,11 +61,10 @@ error_t list_push(list_t *m_list, data_t p_data)
 
     // Allocate memory.
     TRY(error, end, list_reserve(m_list, m_list->slice.length + 1));
+    m_list->slice.length += 1; // Extends.
 
-    uint8_t *const casted_ptr = (uint8_t *)m_list->slice.data.ptr;
-    uint8_t *const indexed_ptr = casted_ptr + (m_list->slice.length * m_list->slice.data.size);
-    memcpy((void *)indexed_ptr, p_data.ptr, p_data.size);
-    m_list->slice.length += 1;
+    // Set the data.
+    TRY(error, end, slice_set(&m_list->slice, m_list->slice.length - 1, p_data));
 
 end:
     return error;
