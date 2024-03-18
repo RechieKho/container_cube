@@ -4,24 +4,16 @@
 
 cow_t slice_slice(const slice_t *p_slice, size_t p_begin, size_t p_end, slice_t *r_slice)
 {
+    // Initialize status.
+    cow_t status = (cow_t){0};
+
     // Bad arguments.
-    if (p_slice == NULL)
-        return COW(true, "Input slice (`p_slice`) is `NULL`.", sizeof(char));
-
-    if (p_begin > p_slice->length)
-        return COW(true, "Begining index (`p_begin`) is out of bound.", sizeof(char));
-
-    if (p_end > p_slice->length)
-        return COW(true, "Ending index (`p_end`) is out of bound.", sizeof(char));
-
-    if (p_begin > p_end)
-        return COW(true, "Begining index (`p_begin`) is greater than ending index (`p_end`).", sizeof(char));
-
-    if (r_slice == NULL)
-        return COW(true, "Returning slice (`r_slice`) is `NULL`.", sizeof(char));
-
-    if (p_slice->data.ptr == NULL)
-        return COW(true, "Input slice's data (`p_slice->data.ptr`) is `NULL`.", sizeof(char));
+    RAISE(status, end, p_slice == NULL, "Input slice (`p_slice`) is `NULL`.");
+    RAISE(status, end, p_begin > p_slice->length, "Begining index (`p_begin`) is out of bound.");
+    RAISE(status, end, p_end > p_slice->length, "Ending index (`p_end`) is out of bound.");
+    RAISE(status, end, p_begin > p_end, "Begining index (`p_begin`) is greater than ending index (`p_end`).");
+    RAISE(status, end, r_slice == NULL, "Returning slice (`r_slice`) is `NULL`.");
+    RAISE(status, end, p_slice->data.ptr == NULL, "Input slice's data (`p_slice->data.ptr`) is `NULL`.");
 
     // Initialize return value.
     *r_slice = (slice_t){0};
@@ -36,23 +28,20 @@ cow_t slice_slice(const slice_t *p_slice, size_t p_begin, size_t p_end, slice_t 
     r_slice->data.size = p_slice->data.size;
     r_slice->length = length;
 
-    return (cow_t){0};
+end:
+    return status;
 }
 
 cow_t slice_borrow(const slice_t *p_slice, size_t p_index, data_t *r_data)
 {
+    // Initialize status.
+    cow_t status = (cow_t){0};
+
     // Bad arguments.
-    if (p_slice == NULL)
-        return COW(true, "Input slice (`p_slice`) is `NULL`.", sizeof(char));
-
-    if (p_index > p_slice->length)
-        return COW(true, "Index (`p_index`) is out of bound.", sizeof(char));
-
-    if (r_data == NULL)
-        return COW(true, "Returning data (`r_data`) is `NULL`.", sizeof(char));
-
-    if (p_slice->data.ptr == NULL)
-        return COW(true, "Input slice's data (`p_slice->data.ptr`) is `NULL`.", sizeof(char));
+    RAISE(status, end, p_slice == NULL, "Input slice (`p_slice`) is `NULL`.");
+    RAISE(status, end, p_index > p_slice->length, "Index (`p_index`) is out of bound.");
+    RAISE(status, end, r_data == NULL, "Returning data (`r_data`) is `NULL`.");
+    RAISE(status, end, p_slice->data.ptr == NULL, "Input slice's data (`p_slice->data.ptr`) is `NULL`.");
 
     // Initialize return value.
     *r_data = (data_t){0};
@@ -65,23 +54,24 @@ cow_t slice_borrow(const slice_t *p_slice, size_t p_index, data_t *r_data)
     r_data->ptr = (void *)new_ptr;
     r_data->size = p_slice->data.size;
 
-    return (cow_t){0};
+end:
+    return status;
 }
 
 cow_t slice_print(const slice_t *p_slice, FILE *m_file)
 {
-    // Bad arguments.
-    if (p_slice == NULL)
-        return COW(true, "Input slice (`p_slice`) is `NULL`.", sizeof(char));
+    // Initialize status.
+    cow_t status = (cow_t){0};
 
-    if (m_file == NULL)
-        return COW(true, "Target file (`m_file`) is `NULL`.", sizeof(char));
+    // Bad arguments.
+    RAISE(status, end, p_slice == NULL, "Input slice (`p_slice`) is `NULL`.");
+    RAISE(status, end, m_file == NULL, "Target file (`m_file`) is `NULL`.");
 
     DATA_CAST(char, slice_char_ptr, p_slice->data);
-    if (slice_char_ptr == NULL)
-        return COW(true, "Unable to cast data of slice (`p_slice->data.ptr`) to `char` due to incompatible size.", sizeof(char));
+    RAISE(status, end, slice_char_ptr == NULL, "Unable to cast data of slice (`p_slice->data.ptr`) to `char` due to incompatible size.");
 
     fprintf(m_file, "%.*s", (int)p_slice->length, *slice_char_ptr);
 
-    return (cow_t){0};
+end:
+    return status;
 }
