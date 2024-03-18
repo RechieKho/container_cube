@@ -79,6 +79,25 @@ end:
     return error;
 }
 
+error_t slice_fill(slice_t *m_slice, size_t p_index, data_t p_data)
+{
+    // Initialize error.
+    ERROR_START(error);
+
+    // Bad arguments.
+    PANIC(error, end, m_slice == NULL, "Target slice (`m_slice`) is `NULL`.");
+    PANIC(error, end, p_index > m_slice->length, "Index (`p_index`) is out of bound.");
+    PANIC(error, end, m_slice->data.ptr == NULL, "Target slice's data (`m_slice->data.ptr`) is `NULL`.");
+
+    // Fill the data.
+    uint8_t *const casted_ptr = (uint8_t *)m_slice->data.ptr;
+    for (size_t i = 0; i < m_slice->length * m_slice->data.size; i += m_slice->data.size)
+        memcpy((void *)&casted_ptr[i], p_data.ptr, p_data.size);
+
+end:
+    return error;
+}
+
 error_t slice_print(const slice_t *p_slice, FILE *m_file)
 {
     // Initialize error.
