@@ -8,7 +8,7 @@
 
 #define INITIAL_CAPACITY 10
 
-list_t list_reserve(list_t *m_list, size_t p_min_capacity)
+error_t list_reserve(list_t *m_list, size_t p_min_capacity)
 {
     // Initialize error.
     ERROR_START(error);
@@ -31,7 +31,7 @@ end:
     return error;
 }
 
-list_t list_clean(list_t *m_list)
+error_t list_clean(list_t *m_list)
 {
     // Initialize error.
     ERROR_START(error);
@@ -49,7 +49,7 @@ end:
     return error;
 }
 
-list_t list_push(list_t *m_list, data_t p_data)
+error_t list_push(list_t *m_list, data_t p_data)
 {
     // Initialize error.
     ERROR_START(error);
@@ -71,7 +71,7 @@ end:
     return error;
 }
 
-list_t list_string_append(list_t *m_string, const char *p_message, ...)
+error_t list_string_append(list_t *m_string, const char *p_message, ...)
 {
     // Initialize error.
     ERROR_START(error);

@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <slice.h>
+#include <error.h>
 
 typedef struct list_t
 {
@@ -22,15 +23,15 @@ typedef struct list_t
     }
 
 /// Reallocate memory with the capacity to be at least `p_min_capacity`.
-list_t list_reserve(list_t *m_list, size_t p_min_capacity);
+error_t list_reserve(list_t *m_list, size_t p_min_capacity);
 
 /// Free all the resource in the list.
-list_t list_clean(list_t *m_list);
+error_t list_clean(list_t *m_list);
 
 /// Push an element into the list.
-list_t list_push(list_t *m_list, data_t p_data);
+error_t list_push(list_t *m_list, data_t p_data);
 
 /// Append formatted string into a list of characters.
-list_t list_string_append(list_t *m_string, const char *p_message, ...);
+error_t list_string_append(list_t *m_string, const char *p_message, ...);
 
 #endif // CONTAINER_LIST_H

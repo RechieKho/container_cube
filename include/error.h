@@ -11,9 +11,11 @@
 /// But since error is saved, the action of saving itself might cause error as well.
 /// Thus, use panic unless you want the caller have an option to handle the error.
 
+typedef list_t error_t;
+
 /// Create a variable with identifier `id_error` that stores error.
 #define ERROR_START(id_error) \
-    list_t id_error = LIST(sizeof(char));
+    error_t id_error = LIST(sizeof(char));
 
 /// Print out the error if available.
 #define ERROR_PRINT(mp_error)                                                        \
@@ -54,8 +56,8 @@
         }                                                                                                                             \
         else                                                                                                                          \
         {                                                                                                                             \
-            list_t m_result = list_string_append(&(mp_error), "\t- Called from " __FILE__ ", line " MACRO_STRINGIFY(__LINE__) ".\n"); \
-            PANIC(mp_error, id_label, m_result.slice.data.ptr != NULL, "Fail to save backtrace.");                                    \
+            error_t m_error = list_string_append(&(mp_error), "\t- Called from " __FILE__ ", line " MACRO_STRINGIFY(__LINE__) ".\n"); \
+            PANIC(mp_error, id_label, m_error.slice.data.ptr != NULL, "Fail to save backtrace.");                                     \
             goto id_label;                                                                                                            \
         }                                                                                                                             \
     }
@@ -68,7 +70,7 @@
 #define RAISE(mp_error, id_label, mp_condition, mp_message...)                                                                            \
     if (mp_condition)                                                                                                                     \
     {                                                                                                                                     \
-        list_t m_error = LIST(sizeof(char));                                                                                              \
+        ERROR_START(m_error);                                                                                                             \
         TRY(m_error, m_end, list_clean(&(mp_error)));                                                                                     \
         TRY(m_error, m_end, list_string_append(&(mp_error), "[Error in " __FILE__ ", line " MACRO_STRINGIFY(__LINE__) "]: " mp_message)); \
         TRY(m_error, m_end, list_push(&(mp_error), DATA("\n", sizeof(char))));                                                            \

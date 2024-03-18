@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <error.h>
 
-list_t slice_slice(const slice_t *p_slice, size_t p_begin, size_t p_end, slice_t *r_slice)
+error_t slice_slice(const slice_t *p_slice, size_t p_begin, size_t p_end, slice_t *r_slice)
 {
     // Initialize error.
     ERROR_START(error);
@@ -33,7 +33,7 @@ end:
     return error;
 }
 
-list_t slice_borrow(const slice_t *p_slice, size_t p_index, data_t *r_data)
+error_t slice_borrow(const slice_t *p_slice, size_t p_index, data_t *r_data)
 {
     // Initialize error.
     ERROR_START(error);
@@ -59,7 +59,7 @@ end:
     return error;
 }
 
-list_t slice_print(const slice_t *p_slice, FILE *m_file)
+error_t slice_print(const slice_t *p_slice, FILE *m_file)
 {
     // Initialize error.
     ERROR_START(error);
