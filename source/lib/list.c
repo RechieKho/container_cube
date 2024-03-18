@@ -9,9 +9,11 @@
 
 cow_t list_reserve(list_t *m_list, size_t p_min_capacity)
 {
+    // Initialize status.
+    cow_t status = (cow_t){0};
+
     // Bad arguments.
-    if (m_list == NULL)
-        return COW(true, "Target list (`m_list`) is `NULL`.", sizeof(char));
+    RAISE(status, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
 
     // Calculate new capacity.
     size_t new_capacity = m_list->capacity == 0 ? INITIAL_CAPACITY : m_list->capacity;
@@ -19,19 +21,22 @@ cow_t list_reserve(list_t *m_list, size_t p_min_capacity)
         new_capacity *= 2;
 
     // Reallocate new memory.
-    if ((m_list->slice.data.ptr = ALLOC(m_list->slice.data.ptr, new_capacity * m_list->slice.data.size)) == NULL)
-        return COW(true, "Fail to allocate memory.", sizeof(char));
+    m_list->slice.data.ptr = ALLOC(m_list->slice.data.ptr, new_capacity * m_list->slice.data.size);
+    RAISE(status, end, m_list->slice.data.ptr == NULL, "Fail to allocate memory.");
 
     m_list->capacity = new_capacity;
 
-    return (cow_t){0};
+end:
+    return status;
 }
 
 cow_t list_clean(list_t *m_list)
 {
+    // Initialize status.
+    cow_t status = (cow_t){0};
+
     // Bad arguments.
-    if (m_list == NULL)
-        return COW(true, "Target list (`m_list`) is `NULL`.", sizeof(char));
+    RAISE(status, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
 
     if (m_list->slice.data.ptr != NULL)
         free(m_list->slice.data.ptr);
@@ -39,44 +44,39 @@ cow_t list_clean(list_t *m_list)
     m_list->slice.length = 0;
     m_list->slice.data.ptr = NULL;
 
-    return (cow_t){0};
+end:
+    return status;
 }
 
 cow_t list_push(list_t *m_list, data_t p_data)
 {
-    // Bad arguments.
-    if (m_list == NULL)
-        return COW(true, "Target list (`m_list`) is `NULL`.", sizeof(char));
-
-    if (p_data.ptr == NULL)
-        return COW(true, "Input data's pointer (`p_data.ptr`) is `NULL`.", sizeof(char));
-
-    if (p_data.size != m_list->slice.data.size)
-        return COW(true, "The size of input data (`p_data`) and target list (`m_list`) is incompatible.", sizeof(char));
-
     // Initialize status.
     cow_t status = (cow_t){0};
 
+    // Bad arguments.
+    RAISE(status, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
+    RAISE(status, end, p_data.ptr == NULL, "Input data's pointer (`p_data.ptr`) is `NULL`.");
+    RAISE(status, end, p_data.size != m_list->slice.data.size, "The size of input data (`p_data`) and target list (`m_list`) is incompatible.");
+
     // Allocate memory.
-    if ((status = list_reserve(m_list, m_list->slice.length + 1)).data.ptr != NULL)
-        return status;
+    TRY(status, end, list_reserve(m_list, m_list->slice.length + 1));
 
     uint8_t *const casted_ptr = (uint8_t *)m_list->slice.data.ptr;
     uint8_t *const indexed_ptr = casted_ptr + (m_list->slice.length * m_list->slice.data.size);
     memcpy((void *)indexed_ptr, p_data.ptr, p_data.size);
     m_list->slice.length += 1;
 
+end:
     return status;
 }
 
 cow_t list_string_from(list_t *r_string, const char *p_message, ...)
 {
-    // Bad arguments.
-    if (r_string == NULL)
-        return COW(true, "Returning list (`r_string`) is `NULL`.", sizeof(char));
-
     // Initialize status.
     cow_t status = (cow_t){0};
+
+    // Bad arguments.
+    RAISE(status, end, r_string == NULL, "Returning list (`r_string`) is `NULL`.");
 
     // Initialize returning values.
     *r_string = (list_t){0};
@@ -90,14 +90,9 @@ cow_t list_string_from(list_t *r_string, const char *p_message, ...)
 
     // Initialize list.
     list_t list = LIST(sizeof(char));
-    if ((status = list_reserve(&list, length)).data.ptr != NULL)
-        goto cleanup_va;
+    TRY(status, cleanup_va, list_reserve(&list, length));
     DATA_CAST(char, list_char_ptr, list.slice.data);
-    if (list_char_ptr == NULL)
-    {
-        status = COW(true, "Unable to cast list with size of `char` to `char`. [Internal error]", sizeof(char));
-        goto cleanup_va;
-    }
+    RAISE(status, cleanup_va, list_char_ptr == NULL, "Unable to cast list with size of `char` to `char`. [Internal error]");
 
     // Write to list.
     vsnprintf(*list_char_ptr, length, p_message, args); // `vsnprintf` will always write null-terminator.
@@ -110,8 +105,6 @@ cow_t list_string_from(list_t *r_string, const char *p_message, ...)
 cleanup_va:
     va_end(args);
 
-    if (!status.borrowed && status.data.ptr != NULL)
-        FREE(status.data.ptr);
-
+end:
     return status;
 }
