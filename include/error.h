@@ -20,7 +20,7 @@ typedef list_t error_t;
 /// Print out the error if available.
 #define ERROR_PRINT(mp_error)                                                        \
     if ((mp_error).slice.data.ptr != NULL && (mp_error).slice.data.ptr != (void *)1) \
-        slice_print(&(mp_error).slice, stderr);
+        slice_write(&(mp_error).slice, stderr);
 
 /// Clean up the error variable if available.
 #define ERROR_END(mp_error)                                          \

@@ -10,7 +10,7 @@ int main()
     TRY(error, end, list_string_append(&message, "Hello world, %d", 135));
     TRY(error, end, list_push(&message, DATA("b", sizeof(char))));
     TRY(error, end, list_push(&message, DATA("\n", sizeof(char))));
-    TRY(error, end, slice_print(&message.slice, stdout));
+    TRY(error, end, slice_print(&message.slice));
 
 end:
     ERROR_PRINT(error)

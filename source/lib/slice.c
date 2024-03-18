@@ -98,7 +98,7 @@ end:
     return error;
 }
 
-error_t slice_print(const slice_t *p_slice, FILE *m_file)
+error_t slice_write(const slice_t *p_slice, FILE *m_file)
 {
     // Initialize error.
     ERROR_START(error);
@@ -114,4 +114,11 @@ error_t slice_print(const slice_t *p_slice, FILE *m_file)
 
 end:
     return error;
+}
+
+error_t slice_print(const slice_t *p_slice)
+{
+    ERROR_START(error);
+    slice_write(p_slice,stdout);
+    return error;    
 }

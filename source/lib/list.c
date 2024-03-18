@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <error.h>
 
-#define INITIAL_CAPACITY 10
+#define INITIAL_CAPACITY 16
 
 error_t list_reserve(list_t *m_list, size_t p_min_capacity)
 {
