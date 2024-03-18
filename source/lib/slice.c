@@ -1,11 +1,12 @@
 #include <slice.h>
 
 #include <stdint.h>
+#include <error.h>
 
-cow_t slice_slice(const slice_t *p_slice, size_t p_begin, size_t p_end, slice_t *r_slice)
+list_t slice_slice(const slice_t *p_slice, size_t p_begin, size_t p_end, slice_t *r_slice)
 {
     // Initialize status.
-    cow_t status = (cow_t){0};
+    ERROR_START(status);
 
     // Bad arguments.
     RAISE(status, end, p_slice == NULL, "Input slice (`p_slice`) is `NULL`.");
@@ -32,10 +33,10 @@ end:
     return status;
 }
 
-cow_t slice_borrow(const slice_t *p_slice, size_t p_index, data_t *r_data)
+list_t slice_borrow(const slice_t *p_slice, size_t p_index, data_t *r_data)
 {
     // Initialize status.
-    cow_t status = (cow_t){0};
+    ERROR_START(status);
 
     // Bad arguments.
     RAISE(status, end, p_slice == NULL, "Input slice (`p_slice`) is `NULL`.");
@@ -58,10 +59,10 @@ end:
     return status;
 }
 
-cow_t slice_print(const slice_t *p_slice, FILE *m_file)
+list_t slice_print(const slice_t *p_slice, FILE *m_file)
 {
     // Initialize status.
-    cow_t status = (cow_t){0};
+    ERROR_START(status);
 
     // Bad arguments.
     RAISE(status, end, p_slice == NULL, "Input slice (`p_slice`) is `NULL`.");
