@@ -4,13 +4,14 @@
 #include <alloc.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <error.h>
 
 #define INITIAL_CAPACITY 10
 
-cow_t list_reserve(list_t *m_list, size_t p_min_capacity)
+list_t list_reserve(list_t *m_list, size_t p_min_capacity)
 {
     // Initialize status.
-    cow_t status = (cow_t){0};
+    ERROR_START(status);
 
     // Bad arguments.
     RAISE(status, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
@@ -30,10 +31,10 @@ end:
     return status;
 }
 
-cow_t list_clean(list_t *m_list)
+list_t list_clean(list_t *m_list)
 {
     // Initialize status.
-    cow_t status = (cow_t){0};
+    ERROR_START(status);
 
     // Bad arguments.
     RAISE(status, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
@@ -48,10 +49,10 @@ end:
     return status;
 }
 
-cow_t list_push(list_t *m_list, data_t p_data)
+list_t list_push(list_t *m_list, data_t p_data)
 {
     // Initialize status.
-    cow_t status = (cow_t){0};
+    ERROR_START(status);
 
     // Bad arguments.
     RAISE(status, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
@@ -70,10 +71,10 @@ end:
     return status;
 }
 
-cow_t list_string_from(list_t *r_string, const char *p_message, ...)
+list_t list_string_from(list_t *r_string, const char *p_message, ...)
 {
     // Initialize status.
-    cow_t status = (cow_t){0};
+    ERROR_START(status);
 
     // Bad arguments.
     RAISE(status, end, r_string == NULL, "Returning list (`r_string`) is `NULL`.");
