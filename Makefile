@@ -18,37 +18,37 @@ TOOLCHAIN_DIR:=$(PLATFORM_DIR)toolchain/
 # PLATFORM := windows || linux || macos
 # ARCH := x86_32 || x86_64 || arm
 ifeq ($(OS),Windows_NT)
-	PLATFORM?=windows
-	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-		ARCH?=x86_64
-	else ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-		ARCH?=x86_32
-	else 
-		$(info "Undefined arch '$(PROCESSOR_ARCHITECTURE)', default to 'x86_64'.")
-		ARCH?=x86_64
-	endif
+PLATFORM?=windows
+ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+ARCH?=x86_64
+else ifeq ($(PROCESSOR_ARCHITECTURE),x86)
+ARCH?=x86_32
+else 
+$(info "Undefined arch '$(PROCESSOR_ARCHITECTURE)', default to 'x86_64'.")
+ARCH?=x86_64
+endif
 else
-	UNAME_PLATFORM:= $(shell uname -s)
-	ifeq ($(UNAME_PLATFORM),Linux)
-		PLATFORM?=linux
-	else ifeq ($(UNAME_PLATFORM),Darwin)
-		PLATFORM?=macos
-	else
-		$(info "Undefined platform '$(UNAME_PLATFORM)', default to 'Linux'.")
-		PLATFORM?=linux
-	endif
+UNAME_PLATFORM:= $(shell uname -s)
+ifeq ($(UNAME_PLATFORM),Linux)
+PLATFORM?=linux
+else ifeq ($(UNAME_PLATFORM),Darwin)
+PLATFORM?=macos
+else
+$(info "Undefined platform '$(UNAME_PLATFORM)', default to 'Linux'.")
+PLATFORM?=linux
+endif
 
-	UNAME_ARCH := $(shell uname -p)
-	ifeq ($(UNAME_ARCH),x86_64)
-		ARCH?=x86_64
-	else ifneq ($(filter %86,$(UNAME_ARCH)),)
-		ARCH?=x86_32
-	else ifneq ($(filter arm%,$(UNAME_ARCH)),)
-		ARCH?=arm
-	else
-		$(info "Undefined arch '$(UNAME_ARCH)', default to 'x86_64'.")
-		ARCH:=x86_64
-	endif
+UNAME_ARCH := $(shell uname -p)
+ifeq ($(UNAME_ARCH),x86_64)
+ARCH?=x86_64
+else ifneq ($(filter %86,$(UNAME_ARCH)),)
+ARCH?=x86_32
+else ifneq ($(filter arm%,$(UNAME_ARCH)),)
+ARCH?=arm
+else
+$(info "Undefined arch '$(UNAME_ARCH)', default to 'x86_64'.")
+ARCH:=x86_64
+endif
 endif
 export PLATFORM
 export ARCH
