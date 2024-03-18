@@ -13,7 +13,7 @@ int main()
 
 end:
     if (status.data.ptr != NULL)
-        printf("%s", (char *)status.data.ptr);
+        printf("%s\n", (char *)status.data.ptr);
 
     return 0;
 }
