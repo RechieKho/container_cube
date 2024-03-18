@@ -1,5 +1,6 @@
 #include <slice.h>
 
+#include <string.h>
 #include <stdint.h>
 #include <error.h>
 
@@ -54,6 +55,25 @@ error_t slice_borrow(const slice_t *p_slice, size_t p_index, data_t *r_data)
     // Return value.
     r_data->ptr = (void *)new_ptr;
     r_data->size = p_slice->data.size;
+
+end:
+    return error;
+}
+
+error_t slice_set(slice_t *m_slice, size_t p_index, data_t p_data)
+{
+    // Initialize error.
+    ERROR_START(error);
+
+    // Bad arguments.
+    PANIC(error, end, m_slice == NULL, "Target slice (`m_slice`) is `NULL`.");
+    PANIC(error, end, p_index > m_slice->length, "Index (`p_index`) is out of bound.");
+    PANIC(error, end, m_slice->data.ptr == NULL, "Target slice's data (`m_slice->data.ptr`) is `NULL`.");
+
+    // Calculate.
+    uint8_t *const casted_ptr = (uint8_t *)m_slice->data.ptr;
+    uint8_t *const indexed_ptr = casted_ptr + (p_index * m_slice->data.size);
+    memcpy((void *)indexed_ptr, p_data.ptr, p_data.size);
 
 end:
     return error;

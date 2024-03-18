@@ -31,6 +31,9 @@ error_t slice_slice(const slice_t *p_slice, size_t p_begin, size_t p_end, slice_
 /// Index a `slice_t`.
 error_t slice_borrow(const slice_t *p_slice, size_t p_index, data_t *r_data);
 
+/// Set a `slice_t` at given `p_index` index.
+error_t slice_set(slice_t *m_slice, size_t p_index, data_t p_data);
+
 /// Print out the slice of characters to file. The slice must be having data's size same as character's size.
 error_t slice_print(const slice_t *p_slice, FILE *m_file);
 
