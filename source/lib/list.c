@@ -10,11 +10,11 @@
 
 list_t list_reserve(list_t *m_list, size_t p_min_capacity)
 {
-    // Initialize status.
-    ERROR_START(status);
+    // Initialize error.
+    ERROR_START(error);
 
     // Bad arguments.
-    RAISE(status, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
+    PANIC(error, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
 
     // Calculate new capacity.
     size_t new_capacity = m_list->capacity == 0 ? INITIAL_CAPACITY : m_list->capacity;
@@ -23,21 +23,21 @@ list_t list_reserve(list_t *m_list, size_t p_min_capacity)
 
     // Reallocate new memory.
     m_list->slice.data.ptr = ALLOC(m_list->slice.data.ptr, new_capacity * m_list->slice.data.size);
-    PANIC(status, end, m_list->slice.data.ptr == NULL, "Fail to allocate `%zu` bytes memory.", new_capacity * m_list->slice.data.size);
+    PANIC(error, end, m_list->slice.data.ptr == NULL, "Fail to allocate `%zu` bytes memory.", new_capacity * m_list->slice.data.size);
 
     m_list->capacity = new_capacity;
 
 end:
-    return status;
+    return error;
 }
 
 list_t list_clean(list_t *m_list)
 {
-    // Initialize status.
-    ERROR_START(status);
+    // Initialize error.
+    ERROR_START(error);
 
     // Bad arguments.
-    RAISE(status, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
+    PANIC(error, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
 
     if (m_list->slice.data.ptr != NULL)
         free(m_list->slice.data.ptr);
@@ -46,21 +46,21 @@ list_t list_clean(list_t *m_list)
     m_list->slice.data.ptr = NULL;
 
 end:
-    return status;
+    return error;
 }
 
 list_t list_push(list_t *m_list, data_t p_data)
 {
-    // Initialize status.
-    ERROR_START(status);
+    // Initialize error.
+    ERROR_START(error);
 
     // Bad arguments.
-    RAISE(status, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
-    RAISE(status, end, p_data.ptr == NULL, "Input data's pointer (`p_data.ptr`) is `NULL`.");
-    RAISE(status, end, p_data.size != m_list->slice.data.size, "The size of input data (`p_data`) and target list (`m_list`) is incompatible.");
+    PANIC(error, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
+    PANIC(error, end, p_data.ptr == NULL, "Input data's pointer (`p_data.ptr`) is `NULL`.");
+    PANIC(error, end, p_data.size != m_list->slice.data.size, "The size of input data (`p_data`) and target list (`m_list`) is incompatible.");
 
     // Allocate memory.
-    TRY(status, end, list_reserve(m_list, m_list->slice.length + 1));
+    TRY(error, end, list_reserve(m_list, m_list->slice.length + 1));
 
     uint8_t *const casted_ptr = (uint8_t *)m_list->slice.data.ptr;
     uint8_t *const indexed_ptr = casted_ptr + (m_list->slice.length * m_list->slice.data.size);
@@ -68,19 +68,17 @@ list_t list_push(list_t *m_list, data_t p_data)
     m_list->slice.length += 1;
 
 end:
-    return status;
+    return error;
 }
 
-list_t list_string_from(list_t *r_string, const char *p_message, ...)
+list_t list_string_append(list_t *m_string, const char *p_message, ...)
 {
-    // Initialize status.
-    ERROR_START(status);
+    // Initialize error.
+    ERROR_START(error);
 
     // Bad arguments.
-    RAISE(status, end, r_string == NULL, "Returning list (`r_string`) is `NULL`.");
-
-    // Initialize returning values.
-    *r_string = (list_t){0};
+    PANIC(error, end, m_string == NULL, "Target list (`m_string`) is `NULL`.");
+    PANIC(error, end, m_string->slice.data.size != sizeof(char), "The size of target list (`m_string`) and the size of character is incompatible");
 
     // Initialize variadic arguments.
     va_list args;
@@ -90,22 +88,18 @@ list_t list_string_from(list_t *r_string, const char *p_message, ...)
     size_t length = vsnprintf(NULL, 0, p_message, args) + 1; // Include null-terminator.
 
     // Initialize list.
-    list_t list = LIST(sizeof(char));
-    TRY(status, cleanup_va, list_reserve(&list, length));
-    DATA_CAST(char, list_char_ptr, list.slice.data);
-    RAISE(status, cleanup_va, list_char_ptr == NULL, "Unable to cast list with size of `char` to `char`. [Internal error]");
+    TRY(error, cleanup_va, list_reserve(m_string, length));
+    DATA_CAST(char, string_char_ptr, m_string->slice.data);
+    RAISE(error, cleanup_va, string_char_ptr == NULL, "Unable to cast list with size of `char` to `char`. [Internal error]");
 
     // Write to list.
-    vsnprintf(*list_char_ptr, length, p_message, args); // `vsnprintf` will always write null-terminator.
-    list.slice.length = length - 1;                     // Exclude null-terminator.
-
-    // Return values.
-    *r_string = list;
+    vsnprintf(&(*string_char_ptr)[m_string->slice.length], length, p_message, args); // `vsnprintf` will always write null-terminator.
+    m_string->slice.length += length - 1;                                            // Exclude null-terminator.
 
     // Clean up.
 cleanup_va:
     va_end(args);
 
 end:
-    return status;
+    return error;
 }

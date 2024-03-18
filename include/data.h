@@ -18,6 +18,6 @@ typedef struct data_t
 /// Results `id_ref` variable that points to `mp_data.ptr` (a double pointer).
 /// `id_ref` is `NULL` when the size is not the same.
 #define DATA_CAST(id_type, id_ref, mp_data) \
-    id_type **const id_ref = sizeof(id_type) == (mp_data).size ? (id_type **)&(mp_data).ptr : NULL
+    id_type **const id_ref = sizeof(id_type) == (mp_data).size ? (id_type **)&(mp_data).ptr : NULL;
 
 #endif // CONTAINER_DATA_H
