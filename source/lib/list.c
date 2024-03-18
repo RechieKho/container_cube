@@ -22,7 +22,7 @@ cow_t list_reserve(list_t *m_list, size_t p_min_capacity)
 
     // Reallocate new memory.
     m_list->slice.data.ptr = ALLOC(m_list->slice.data.ptr, new_capacity * m_list->slice.data.size);
-    RAISE(status, end, m_list->slice.data.ptr == NULL, "Fail to allocate memory.");
+    PANIC(status, end, m_list->slice.data.ptr == NULL, "Fail to allocate `%zu` bytes memory.", new_capacity * m_list->slice.data.size);
 
     m_list->capacity = new_capacity;
 
