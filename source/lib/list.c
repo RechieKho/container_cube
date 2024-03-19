@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <error.h>
 
-#define INITIAL_CAPACITY 10
+#define INITIAL_CAPACITY 16
 
 error_t list_reserve(list_t *m_list, size_t p_min_capacity)
 {
@@ -40,7 +40,7 @@ error_t list_clean(list_t *m_list)
     PANIC(error, end, m_list == NULL, "Target list (`m_list`) is `NULL`.");
 
     if (m_list->slice.data.ptr != NULL)
-        free(m_list->slice.data.ptr);
+        FREE(m_list->slice.data.ptr);
     m_list->capacity = 0;
     m_list->slice.length = 0;
     m_list->slice.data.ptr = NULL;
@@ -108,7 +108,7 @@ error_t list_string_append(list_t *m_string, const char *p_message, ...)
     // Initialize list.
     TRY(error, cleanup_va, list_reserve(m_string, length));
     DATA_CAST(char, string_char_ptr, m_string->slice.data);
-    RAISE(error, cleanup_va, string_char_ptr == NULL, "Unable to cast list with size of `char` to `char`. [Internal error]");
+    PANIC(error, cleanup_va, string_char_ptr == NULL, "Unable to cast list with size of `char` to `char`. [Internal error]");
 
     // Write to list.
     vsnprintf(&(*string_char_ptr)[m_string->slice.length], length, p_message, args); // `vsnprintf` will always write null-terminator.

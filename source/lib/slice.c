@@ -98,7 +98,7 @@ end:
     return error;
 }
 
-error_t slice_print(const slice_t *p_slice, FILE *m_file)
+error_t slice_write(const slice_t *p_slice, FILE *m_file)
 {
     // Initialize error.
     ERROR_START(error);
@@ -108,7 +108,7 @@ error_t slice_print(const slice_t *p_slice, FILE *m_file)
     PANIC(error, end, m_file == NULL, "Target file (`m_file`) is `NULL`.");
 
     DATA_CAST(char, slice_char_ptr, p_slice->data);
-    RAISE(error, end, slice_char_ptr == NULL, "Unable to cast data of slice (`p_slice->data.ptr`) to `char` due to incompatible size.");
+    PANIC(error, end, slice_char_ptr == NULL, "Unable to cast data of slice (`p_slice->data.ptr`) to `char` due to incompatible size.");
 
     fprintf(m_file, "%.*s", (int)p_slice->length, *slice_char_ptr);
 
